@@ -33,8 +33,7 @@
 		<title>A simple Hoare triple prover &middot; Giorgio Dell&#39;Immagine</title>
 		<link rel="shortcut icon" href="https://gio54321.github.io/images/favicon.ico">
 		<link rel="stylesheet" href="https://gio54321.github.io/css/style.css">
-		<link rel="stylesheet" href="https://gio54321.github.io/css/highlight.css">
-		<link rel="stylesheet" href="https://gio54321.github.io/css/syntax.css">
+		<link rel="stylesheet" href="https://gio54321.github.io/css/prism.css">
 
 		
 		<link rel="stylesheet" href="https://gio54321.github.io/css/font-awesome.min.css">
@@ -233,7 +232,7 @@ In particular I used <a href="https://github.com/Z3Prover/z3">z3 theorem prover<
 <h2 id="the-parser">The parser</h2>
 
 <p>Using lark, parsing was surprisingly easy. I just defined the grammar into a big string and lark taked care of everything. The grammar can be seen in the <a href="https://github.com/gio54321/hoare-logic-prover/blob/master/src/lpp_parser.py">source code for the parser</a>. An example triple that can be accepted by the parser is:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[x, A]
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">[x, A]
 {x==A}
 x := x-3;
 if (x &gt;= 0) then
@@ -247,101 +246,101 @@ fi
 <h2 id="the-prover">The prover</h2>
 
 <p>The basic building block for the theorem prover is a function that takes in input a z3 formula and tries to prove the validity of if. This is implemented as follows.</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">prove_formula</span>(self, what_to_prove):
-    s <span style="color:#f92672">=</span> z3<span style="color:#f92672">.</span>Solver()
-    s<span style="color:#f92672">.</span>add(z3<span style="color:#f92672">.</span>Not(what_to_prove))
-    res <span style="color:#f92672">=</span> s<span style="color:#f92672">.</span>check()
-    <span style="color:#66d9ef">if</span> str(res) <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">unsat</span><span style="color:#e6db74">&#34;</span>:
-        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">proved</span><span style="color:#e6db74">&#34;</span>, what_to_prove)
-        <span style="color:#66d9ef">return</span> True
-    <span style="color:#66d9ef">else</span>:
-        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">could not prove</span><span style="color:#e6db74">&#34;</span>, what_to_prove)
-        <span style="color:#66d9ef">return</span> False</code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">prove_formula</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">what_to_prove</span><span class="p">)</span><span class="p">:</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">z3</span><span class="o">.</span><span class="n">Solver</span><span class="p">(</span><span class="p">)</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">z3</span><span class="o">.</span><span class="n">Not</span><span class="p">(</span><span class="n">what_to_prove</span><span class="p">)</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">==</span> <span class="sa"></span><span class="s2">&#34;</span><span class="s2">unsat</span><span class="s2">&#34;</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">proved</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">what_to_prove</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">could not prove</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">what_to_prove</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">False</span></code></pre></div>
 <p>The z3's <code>check()</code> function can only give you 2 results: <code>sat</code>, which means that the formula is satisfiable, and <code>unsat</code>, which means the formula is unsatisfiable. So there is no result for valid, but we can use a well known fact in logic: a formula <span  class="math">\(\phi\)</span> is valis iff <span  class="math">\(\neg \phi\)</span> is unsatisfiable. So we negate the formula and if it is unsatisfiable, then the formula is considered proved.</p>
 
-<p>Now let's start implementing the main protagonist of this jurney: the <code>prove_triple</code> function, that takes in input a precondition as a z3 formula, a command as a parse tree and a postcondition as a z3 formula and returns True if the triple is valid, False otherwise. The first inference rule we will implement is the simplest one: the <strong>skip</strong> rule.</p>
+<p>Now let's start implementing the main protagonist of this jurney: the <em>prove_triple</em> function, that takes in input a precondition as a z3 formula, a command as a parse tree and a postcondition as a z3 formula and returns True if the triple is valid, False otherwise. The first inference rule we will implement is the simplest one: the <strong>skip</strong> rule.</p>
 
 <p><span  class="math">\[\frac{P \to Q}{\{P\}\text{skip}\{Q\}}\quad (\text{SKIP})\]</span></p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">prove_triple</span>(self, precond, command, postcond):
-    <span style="color:#66d9ef">if</span> command<span style="color:#f92672">.</span>data <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">skip</span><span style="color:#e6db74">&#34;</span>:
-        formula_to_prove <span style="color:#f92672">=</span> z3<span style="color:#f92672">.</span>Implies(precond, postcond)
-        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">found skip statement, trying to prove</span><span style="color:#e6db74">&#34;</span>, formula_to_prove)
-        res <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>prove_formula(formula_to_prove)
-        <span style="color:#66d9ef">return</span> res</code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">prove_triple</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precond</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">postcond</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">command</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="sa"></span><span class="s2">&#34;</span><span class="s2">skip</span><span class="s2">&#34;</span><span class="p">:</span>
+        <span class="n">formula_to_prove</span> <span class="o">=</span> <span class="n">z3</span><span class="o">.</span><span class="n">Implies</span><span class="p">(</span><span class="n">precond</span><span class="p">,</span> <span class="n">postcond</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">found skip statement, trying to prove</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">formula_to_prove</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prove_formula</span><span class="p">(</span><span class="n">formula_to_prove</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span></code></pre></div>
 <p>Here we state that for proving a skip triple it is sufficient to prove that the precondition implies the postcondition.</p>
 
 <p>Now let's implement the <strong>assignment</strong> inference rule.</p>
 
 <p><span  class="math">\[\frac{P \to Q[x \mapsto E]}{\{P\}x:=E\{Q\}}\quad (\text{ASSIGNMENT})\]</span></p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">elif</span> command<span style="color:#f92672">.</span>data <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">assignment</span><span style="color:#e6db74">&#34;</span>:
-    ide, exp <span style="color:#f92672">=</span> command<span style="color:#f92672">.</span>children
-    formula_to_prove <span style="color:#f92672">=</span> z3<span style="color:#f92672">.</span>Implies(
-        precond,
-        z3<span style="color:#f92672">.</span>substitute(postcond, (self<span style="color:#f92672">.</span>env[ide], self<span style="color:#f92672">.</span>expr_to_z3_formula(exp)))
-    )
-    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">found assignment statement, trying to prove</span><span style="color:#e6db74">&#34;</span>, formula_to_prove)
-    res <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>prove_formula(formula_to_prove)
-    <span style="color:#66d9ef">return</span> res</code></pre></div>
-<p>Now let's go on and implement the <strong>conditional</strong> inference rule. This is when <code>prove_triple()</code> becomes <strong>inductive</strong>, as it calls itself on a subtree of the parse tree.</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">elif</span> <span class="n">command</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="sa"></span><span class="s2">&#34;</span><span class="s2">assignment</span><span class="s2">&#34;</span><span class="p">:</span>
+    <span class="n">ide</span><span class="p">,</span> <span class="n">exp</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">children</span>
+    <span class="n">formula_to_prove</span> <span class="o">=</span> <span class="n">z3</span><span class="o">.</span><span class="n">Implies</span><span class="p">(</span>
+        <span class="n">precond</span><span class="p">,</span>
+        <span class="n">z3</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">postcond</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">[</span><span class="n">ide</span><span class="p">]</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">expr_to_z3_formula</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span><span class="p">)</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">found assignment statement, trying to prove</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">formula_to_prove</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prove_formula</span><span class="p">(</span><span class="n">formula_to_prove</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span></code></pre></div>
+<p>Now let's go on and implement the <strong>conditional</strong> inference rule. This is when <em>prove_triple</em> becomes <strong>inductive</strong>, as it calls itself on a subtree of the parse tree.</p>
 
 <p><span  class="math">\[\frac{\{P \land E\}C_1\{Q\} \quad \{P \land \neg E\}C_2\{Q\}}{\{P\}\text{if } E \text{ then } C_1 \text{ else } C_2\{Q\}}\quad (\text{IF})\]</span></p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">elif</span> command<span style="color:#f92672">.</span>data <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">if</span><span style="color:#e6db74">&#34;</span>:
-    guard, s1, s2 <span style="color:#f92672">=</span> command<span style="color:#f92672">.</span>children
-    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">found if statement, trying to prove the first alternative</span><span style="color:#e6db74">&#34;</span>)
-    res_1 <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>prove_triple(z3<span style="color:#f92672">.</span>And(precond, self<span style="color:#f92672">.</span>expr_to_z3_formula(guard)), s1, postcond)
-    <span style="color:#66d9ef">if</span> res_1:
-        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">now trying to prove the second alternative</span><span style="color:#e6db74">&#34;</span>)
-        res_2 <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>prove_triple(z3<span style="color:#f92672">.</span>And(precond, z3<span style="color:#f92672">.</span>Not(self<span style="color:#f92672">.</span>expr_to_z3_formula(guard))), s2, postcond)
-        <span style="color:#66d9ef">return</span> res_2
-    <span style="color:#66d9ef">else</span>:
-        <span style="color:#66d9ef">return</span> False</code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">elif</span> <span class="n">command</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="sa"></span><span class="s2">&#34;</span><span class="s2">if</span><span class="s2">&#34;</span><span class="p">:</span>
+    <span class="n">guard</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">children</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">found if statement, trying to prove the first alternative</span><span class="s2">&#34;</span><span class="p">)</span>
+    <span class="n">res_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prove_triple</span><span class="p">(</span><span class="n">z3</span><span class="o">.</span><span class="n">And</span><span class="p">(</span><span class="n">precond</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">expr_to_z3_formula</span><span class="p">(</span><span class="n">guard</span><span class="p">)</span><span class="p">)</span><span class="p">,</span> <span class="n">s1</span><span class="p">,</span> <span class="n">postcond</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">res_1</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">now trying to prove the second alternative</span><span class="s2">&#34;</span><span class="p">)</span>
+        <span class="n">res_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prove_triple</span><span class="p">(</span><span class="n">z3</span><span class="o">.</span><span class="n">And</span><span class="p">(</span><span class="n">precond</span><span class="p">,</span> <span class="n">z3</span><span class="o">.</span><span class="n">Not</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expr_to_z3_formula</span><span class="p">(</span><span class="n">guard</span><span class="p">)</span><span class="p">)</span><span class="p">)</span><span class="p">,</span> <span class="n">s2</span><span class="p">,</span> <span class="n">postcond</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res_2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span></code></pre></div>
 <p>There is nothing magical in the code yet: these three cases are the direct translation of the inference rule.</p>
 
 <p>Now let's talk about <strong>composition</strong>. From the inference rule we know we have to search for an intermediate assertion, so that both intermediate triples are valid.</p>
 
 <p><span  class="math">\[\frac{\{P\}C_1\{R\} \quad \{R\}C_2\{Q\}}{\{P\}C_1;C_2\{Q\}}\quad (\text{COMPOSITION})\]</span></p>
 
-<p>There is no rule on how to find it, but we can use some heuristics to find it. Basically we try to find an assertion <span  class="math">\(R\)</span> so that <span  class="math">\(\{R\}C_2\{Q\}\)</span> is an <strong>axiom</strong> (so is valid in our proof system) and then we delegate the validity of the whole triple to the validity of <span  class="math">\(\{P\}C_1\{R\}\)</span>. To do this we need a new function called <code>find_axiom()</code> that takes in input a command as a parse tree and a postondition as a z3 formula and tries to find a precondition so that the triple is an axiom. Remember that there are only two axioms in our system, so we can implement only them.</p>
+<p>There is no rule on how to find it, but we can use some heuristics to find it. Basically we try to find an assertion <span  class="math">\(R\)</span> so that <span  class="math">\(\{R\}C_2\{Q\}\)</span> is an <strong>axiom</strong> (so is valid in our proof system) and then we delegate the validity of the whole triple to the validity of <span  class="math">\(\{P\}C_1\{R\}\)</span>. To do this we need a new function called <em>find_axiom</em> that takes in input a command as a parse tree and a postondition as a z3 formula and tries to find a precondition so that the triple is an axiom. Remember that there are only two axioms in our system, so we can implement only them.</p>
 
 <p><span  class="math">\[\frac{}{\{P\}\text{skip}\{P\}}\quad (\text{SKIP-AX})\]</span></p>
 
 <p><span  class="math">\[\frac{}{\{P[x \mapsto E]\}x:=E\{P\}}\quad (\text{ASSIGNMENT-AX})\]</span></p>
 
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">find_axiom</span>(self, command, postcond):
-    <span style="color:#66d9ef">if</span> command<span style="color:#f92672">.</span>data <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">skip</span><span style="color:#e6db74">&#34;</span>:
-        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">found axiom for skip statement:</span><span style="color:#e6db74">&#34;</span>, postcond)
-        <span style="color:#66d9ef">return</span> (True, postcond)
-    <span style="color:#66d9ef">elif</span> command<span style="color:#f92672">.</span>data <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">assignment</span><span style="color:#e6db74">&#34;</span>:
-        ide, exp <span style="color:#f92672">=</span> command<span style="color:#f92672">.</span>children
-        axiom <span style="color:#f92672">=</span> z3<span style="color:#f92672">.</span>substitute(postcond, (self<span style="color:#f92672">.</span>env[ide], self<span style="color:#f92672">.</span>expr_to_z3_formula(exp)))
-        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">found axiom for assignment statement:</span><span style="color:#e6db74">&#34;</span>, axiom)
-        <span style="color:#66d9ef">return</span> (True, axiom)
-    <span style="color:#66d9ef">else</span>:
-        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">could not find axiom</span><span style="color:#e6db74">&#34;</span>)
-        <span style="color:#66d9ef">return</span> (False, None)</code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">find_axiom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">postcond</span><span class="p">)</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">command</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="sa"></span><span class="s2">&#34;</span><span class="s2">skip</span><span class="s2">&#34;</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">found axiom for skip statement:</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">postcond</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="n">postcond</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">command</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="sa"></span><span class="s2">&#34;</span><span class="s2">assignment</span><span class="s2">&#34;</span><span class="p">:</span>
+        <span class="n">ide</span><span class="p">,</span> <span class="n">exp</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">children</span>
+        <span class="n">axiom</span> <span class="o">=</span> <span class="n">z3</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">postcond</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">[</span><span class="n">ide</span><span class="p">]</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">expr_to_z3_formula</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span><span class="p">)</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">found axiom for assignment statement:</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">axiom</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="n">axiom</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">could not find axiom</span><span class="s2">&#34;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span></code></pre></div>
 
 <p>Now we are all set for implementing the composition rule.</p>
 
 <p><span  class="math">\[\frac{\{P\}C_1\{R\} \quad \{R\}C_2\{Q\}}{\{P\}C_1;C_2\{Q\}}\quad (\text{COMPOSITION})\]</span></p>
 
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">elif</span> command<span style="color:#f92672">.</span>data <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">composition</span><span style="color:#e6db74">&#34;</span>:
-    c1, c2 <span style="color:#f92672">=</span> command<span style="color:#f92672">.</span>children
-    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">found composition, trying to find axiom for the right side</span><span style="color:#e6db74">&#34;</span>)
-    (res, axiom) <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>find_axiom(c2, postcond)
-    <span style="color:#66d9ef">if</span> res:
-        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>prove_triple(precond, c1, axiom)
-    <span style="color:#66d9ef">else</span>:
-        <span style="color:#66d9ef">return</span> False</code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">elif</span> <span class="n">command</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="sa"></span><span class="s2">&#34;</span><span class="s2">composition</span><span class="s2">&#34;</span><span class="p">:</span>
+    <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">children</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">found composition, trying to find axiom for the right side</span><span class="s2">&#34;</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">axiom</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_axiom</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span> <span class="n">postcond</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">res</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prove_triple</span><span class="p">(</span><span class="n">precond</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">axiom</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span></code></pre></div>
 
 <p>With theese simple inference rules implemented, we can try our prover on a variable swap. So the input triple looks like this:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[x, y, z, A, B]
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">[x, y, z, A, B]
 {x==A and y==B}
 z := x;
 x := y;
 y := z
 {x==B and y==A}</code></pre></div>
 <p>The output of our prover is:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">What to prove: [x, y, z, A, B]
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">What to prove: [x, y, z, A, B]
 {x==A and y==B}
 z := x;
 x := y;
@@ -361,38 +360,38 @@ The triple is valid</code></pre></div>
 <p>Now we just have to implement the scary one: the <strong>while</strong> inference rule. Luckly we got the hang of it, and now the code is pretty much a direct application of the inference rule.</p>
 
 <p><span  class="math">\[\frac{\begin{gathered} P \to inv \quad inv \to Q \quad inv \to t \geq 0 \\\{inv \land E\}C\{inv\} \quad \{inv \land E \land t=V\}C\{ t \lt V \} \end{gathered}}{\{P\}\text{while }E \text{ do } C \text{ endw}\{Q\}}\quad \text{(WHILE)}\]</span></p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">elif</span> command<span style="color:#f92672">.</span>data <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">while</span><span style="color:#e6db74">&#34;</span>:
-    e, t_expr, inv, c <span style="color:#f92672">=</span> command<span style="color:#f92672">.</span>children
-    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">found while statement, trying to prove:</span><span style="color:#e6db74">&#34;</span>)
-    invariant <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>expr_to_z3_formula(inv)
-    t <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>expr_to_z3_formula(t_expr)
-    guard <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>expr_to_z3_formula(e)
-    pre <span style="color:#f92672">=</span> z3<span style="color:#f92672">.</span>Implies(precond, invariant)
-    post <span style="color:#f92672">=</span> z3<span style="color:#f92672">.</span>Implies(z3<span style="color:#f92672">.</span>And(precond, z3<span style="color:#f92672">.</span>Not(guard)), postcond)
-    term <span style="color:#f92672">=</span> z3<span style="color:#f92672">.</span>Implies(z3<span style="color:#f92672">.</span>And(invariant, self<span style="color:#f92672">.</span>env[<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">t</span><span style="color:#e6db74">&#34;</span>] <span style="color:#f92672">==</span> t), t<span style="color:#f92672">&gt;</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
-    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">1) [pre]</span><span style="color:#e6db74">&#34;</span>, pre)
-    res_pre <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>prove_formula(pre)
-    <span style="color:#66d9ef">if</span> res_pre:
-        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">2) [post]</span><span style="color:#e6db74">&#34;</span>, post)
-        res_post <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>prove_formula(post)
-        <span style="color:#66d9ef">if</span> res_post:
-            <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">3) [term]</span><span style="color:#e6db74">&#34;</span>, term)
-            res_term <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>prove_formula(term)
-            <span style="color:#66d9ef">if</span> res_term:
-                <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">4) [invariance]</span><span style="color:#e6db74">&#34;</span>, term)
-                res_inv <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>prove_triple(z3<span style="color:#f92672">.</span>And(invariant, guard), c, invariant)
-                <span style="color:#66d9ef">if</span> res_inv:
-                    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">5) [progress]</span><span style="color:#e6db74">&#34;</span>, term)
-                    v <span style="color:#f92672">=</span> z3<span style="color:#f92672">.</span>Int(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">V</span><span style="color:#e6db74">&#34;</span>)
-                    res<span style="color:#f92672">=</span>self<span style="color:#f92672">.</span>prove_triple(
-                        z3<span style="color:#f92672">.</span>And(z3<span style="color:#f92672">.</span>And(invariant, guard), t<span style="color:#f92672">==</span>v),
-                        c,
-                        t<span style="color:#f92672">&lt;</span>v
-                    )
-                    <span style="color:#66d9ef">return</span> res
-    <span style="color:#66d9ef">return</span> False</code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">elif</span> <span class="n">command</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="sa"></span><span class="s2">&#34;</span><span class="s2">while</span><span class="s2">&#34;</span><span class="p">:</span>
+    <span class="n">e</span><span class="p">,</span> <span class="n">t_expr</span><span class="p">,</span> <span class="n">inv</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">children</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">found while statement, trying to prove:</span><span class="s2">&#34;</span><span class="p">)</span>
+    <span class="n">invariant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expr_to_z3_formula</span><span class="p">(</span><span class="n">inv</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expr_to_z3_formula</span><span class="p">(</span><span class="n">t_expr</span><span class="p">)</span>
+    <span class="n">guard</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expr_to_z3_formula</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="n">pre</span> <span class="o">=</span> <span class="n">z3</span><span class="o">.</span><span class="n">Implies</span><span class="p">(</span><span class="n">precond</span><span class="p">,</span> <span class="n">invariant</span><span class="p">)</span>
+    <span class="n">post</span> <span class="o">=</span> <span class="n">z3</span><span class="o">.</span><span class="n">Implies</span><span class="p">(</span><span class="n">z3</span><span class="o">.</span><span class="n">And</span><span class="p">(</span><span class="n">precond</span><span class="p">,</span> <span class="n">z3</span><span class="o">.</span><span class="n">Not</span><span class="p">(</span><span class="n">guard</span><span class="p">)</span><span class="p">)</span><span class="p">,</span> <span class="n">postcond</span><span class="p">)</span>
+    <span class="n">term</span> <span class="o">=</span> <span class="n">z3</span><span class="o">.</span><span class="n">Implies</span><span class="p">(</span><span class="n">z3</span><span class="o">.</span><span class="n">And</span><span class="p">(</span><span class="n">invariant</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">[</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">t</span><span class="s2">&#34;</span><span class="p">]</span> <span class="o">==</span> <span class="n">t</span><span class="p">)</span><span class="p">,</span> <span class="n">t</span><span class="o">&gt;</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">1) [pre]</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">pre</span><span class="p">)</span>
+    <span class="n">res_pre</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prove_formula</span><span class="p">(</span><span class="n">pre</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">res_pre</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">2) [post]</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">post</span><span class="p">)</span>
+        <span class="n">res_post</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prove_formula</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">res_post</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">3) [term]</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">term</span><span class="p">)</span>
+            <span class="n">res_term</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prove_formula</span><span class="p">(</span><span class="n">term</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">res_term</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">4) [invariance]</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">term</span><span class="p">)</span>
+                <span class="n">res_inv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prove_triple</span><span class="p">(</span><span class="n">z3</span><span class="o">.</span><span class="n">And</span><span class="p">(</span><span class="n">invariant</span><span class="p">,</span> <span class="n">guard</span><span class="p">)</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">invariant</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">res_inv</span><span class="p">:</span>
+                    <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">5) [progress]</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">term</span><span class="p">)</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="n">z3</span><span class="o">.</span><span class="n">Int</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">V</span><span class="s2">&#34;</span><span class="p">)</span>
+                    <span class="n">res</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prove_triple</span><span class="p">(</span>
+                        <span class="n">z3</span><span class="o">.</span><span class="n">And</span><span class="p">(</span><span class="n">z3</span><span class="o">.</span><span class="n">And</span><span class="p">(</span><span class="n">invariant</span><span class="p">,</span> <span class="n">guard</span><span class="p">)</span><span class="p">,</span> <span class="n">t</span><span class="o">==</span><span class="n">v</span><span class="p">)</span><span class="p">,</span>
+                        <span class="n">c</span><span class="p">,</span>
+                        <span class="n">t</span><span class="o">&lt;</span><span class="n">v</span>
+                    <span class="p">)</span>
+                    <span class="k">return</span> <span class="n">res</span>
+    <span class="k">return</span> <span class="bp">False</span></code></pre></div>
 <p>So now we can finally prove some simple while triples! I have added some syntax to the while command to code the loop invariant and the expression for <span  class="math">\(t\)</span>. Here's an example triple that calculates <span  class="math">\(5 \cdot 10\)</span> in a very stupid way:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[i, s, t, r]
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">[i, s, t, r]
 {i==0 and r==0}
 while (i&lt;10) where t is (10-i); inv is (r==5*i and 10-i&gt;=0) do
     i := i+1;
@@ -400,7 +399,7 @@ while (i&lt;10) where t is (10-i); inv is (r==5*i and 10-i&gt;=0) do
 endw
 {r==5*10}</code></pre></div>
 <p>This time the output is a bit more cluttered:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">What to prove: [i, s, t, r]
+<div class="highlight"><pre class="chroma"><code class="language-text" data-lang="text">What to prove: [i, s, t, r]
 {i==0 and r==0}
 while (i&lt;10) where t is (10-i); inv is (r==5*i and 10-i&gt;=0) do
     i := i+1;
@@ -440,7 +439,7 @@ The triple is valid</code></pre></div>
 <p>Great! We can see exactly that all 5 while premises have been proved, so it is fair to say that this loop has been proven formally that it <strong>terminates</strong> and r will contain the result of <span  class="math">\(5 \cdot 10\)</span>.</p>
 
 <p>To experiment with this simple system (and maybe contribute to it) you can <code>git clone</code> <a href="https://github.com/gio54321/hoare-logic-prover">the repository</a>, and you can run an example proof (for example the variable swap one) by:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">python src/lpp_prover.py examples/var_swap.lpp</code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">python src/lpp_prover.py examples/var_swap.lpp</code></pre></div>
 <p>In the <a href="https://github.com/gio54321/hoare-logic-prover/tree/master/examples">examples folder</a> on github there are a bunch of triples that should give you the feeling of the capability of this system.</p>
 
 <h1 id="conclusions">Conclusions</h1>
@@ -451,7 +450,7 @@ The triple is valid</code></pre></div>
             </article>
 
             
-                <a class="twitter" href="https://twitter.com/intent/tweet?text=https%3a%2f%2fgio54321.github.io%2fposts%2fcreating-a-new-theme%2f - A%20simple%20Hoare%20triple%20prover by @g_dellimmagine"><span class="icon-twitter"> tweet</span></a>
+                <a class="twitter" href="https://twitter.com/intent/tweet?text=https%3a%2f%2fgio54321.github.io%2fposts%2fhoare-prover%2f - A%20simple%20Hoare%20triple%20prover by @g_dellimmagine"><span class="icon-twitter"> tweet</span></a>
 
 <a class="facebook" href="#" onclick="
     window.open(
@@ -492,7 +491,7 @@ The triple is valid</code></pre></div>
     
     </p>
     <p class="small">
-        Powered by <a href="http://www.gohugo.io/">Hugo</a> Theme By <a href="https://github.com/nodejh/hugo-theme-cactus-plus">nodejh</a>
+        Powered by <a href="http://www.gohugo.io/">Hugo</a>
     </p>
 </footer>
 
@@ -500,7 +499,7 @@ The triple is valid</code></pre></div>
 
         <script src="https://gio54321.github.io/js/jquery-3.3.1.min.js"></script>
 <script src="https://gio54321.github.io/js/main.js"></script>
-<script src="https://gio54321.github.io/js/highlight.min.js"></script>
+<script src="https://gio54321.github.io/js/prism.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">

@@ -13,10 +13,10 @@
     
     <item>
       <title>A simple Hoare triple prover</title>
-      <link>https://gio54321.github.io/posts/creating-a-new-theme/</link>
+      <link>https://gio54321.github.io/posts/hoare-prover/</link>
       <pubDate>Thu, 06 Feb 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://gio54321.github.io/posts/creating-a-new-theme/</guid>
+      <guid>https://gio54321.github.io/posts/hoare-prover/</guid>
       <description>Introduction: what is Hoare logic? First steps According to wikipedia:
  Hoare logic (also known as Floyd–Hoare logic or Hoare rules) is a formal system with a set of logical rules for reasoning rigorously about the correctness of computer programs.
  So this is a powerful system that let us reason formally about the correctness of our program. The basic structure of Hoare logic is the Hoare triple. A triple describes how some properties of the state are modified by the execution of a program.</description>
