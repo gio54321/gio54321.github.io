@@ -3,31 +3,31 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>your_site_url_address/posts/creating-a-new-theme/</loc>
+    <loc>/posts/creating-a-new-theme/</loc>
     <lastmod>2020-02-06T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>your_site_url_address/</loc>
+    <loc>/</loc>
     <lastmod>2020-02-06T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>your_site_url_address/posts/</loc>
+    <loc>/posts/</loc>
     <lastmod>2020-02-06T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>your_site_url_address/about/</loc>
+    <loc>/about/</loc>
     <lastmod>2015-06-20T14:02:37+02:00</lastmod>
   </url>
   
   <url>
-    <loc>your_site_url_address/categories/</loc>
+    <loc>/categories/</loc>
   </url>
   
   <url>
-    <loc>your_site_url_address/tags/</loc>
+    <loc>/tags/</loc>
   </url>
   
 </urlset>
