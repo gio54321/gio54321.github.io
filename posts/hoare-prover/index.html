@@ -53,7 +53,6 @@
 		<a href='https://gio54321.github.io/'> <span class="arrow">←</span>Home</a>
 	
 	<a href='https://gio54321.github.io/posts'>Archive</a>
-	<a href='https://gio54321.github.io/tags'>Tags</a>
 	<a href='https://gio54321.github.io/about'>About</a>
 
 	
@@ -256,9 +255,9 @@ fi
     <span class="k">else</span><span class="p">:</span>
         <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">could not prove</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">what_to_prove</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">False</span></code></pre></div>
-<p>The z3's <code>check()</code> function can only give you 2 results: <code>sat</code>, which means that the formula is satisfiable, and <code>unsat</code>, which means the formula is unsatisfiable. So there is no result for valid, but we can use a well known fact in logic: a formula <span  class="math">\(\phi\)</span> is valis iff <span  class="math">\(\neg \phi\)</span> is unsatisfiable. So we negate the formula and if it is unsatisfiable, then the formula is considered proved.</p>
+<p>The z3's check function can only give you 2 results: <code>sat</code>, which means that the formula is satisfiable, and <code>unsat</code>, which means the formula is unsatisfiable. So there is no result for valid, but we can use a well known fact in logic: a formula <span  class="math">\(\phi\)</span> is valis iff <span  class="math">\(\neg \phi\)</span> is unsatisfiable. So we negate the formula and if it is unsatisfiable, then the formula is considered proved.</p>
 
-<p>Now let's start implementing the main protagonist of this jurney: the <em>prove_triple</em> function, that takes in input a precondition as a z3 formula, a command as a parse tree and a postcondition as a z3 formula and returns True if the triple is valid, False otherwise. The first inference rule we will implement is the simplest one: the <strong>skip</strong> rule.</p>
+<p>Now let's start implementing the main protagonist of this jurney: the <code>prove_triple()</code> function, that takes in input a precondition as a z3 formula, a command as a parse tree and a postcondition as a z3 formula and returns True if the triple is valid, False otherwise. The first inference rule we will implement is the simplest one: the <strong>skip</strong> rule.</p>
 
 <p><span  class="math">\[\frac{P \to Q}{\{P\}\text{skip}\{Q\}}\quad (\text{SKIP})\]</span></p>
 <div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">prove_triple</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precond</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">postcond</span><span class="p">)</span><span class="p">:</span>
@@ -281,7 +280,7 @@ fi
     <span class="k">print</span><span class="p">(</span><span class="sa"></span><span class="s2">&#34;</span><span class="s2">found assignment statement, trying to prove</span><span class="s2">&#34;</span><span class="p">,</span> <span class="n">formula_to_prove</span><span class="p">)</span>
     <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prove_formula</span><span class="p">(</span><span class="n">formula_to_prove</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">res</span></code></pre></div>
-<p>Now let's go on and implement the <strong>conditional</strong> inference rule. This is when <em>prove_triple</em> becomes <strong>inductive</strong>, as it calls itself on a subtree of the parse tree.</p>
+<p>Now let's go on and implement the <strong>conditional</strong> inference rule. This is when <code>prove_triple</code> becomes <strong>inductive</strong>, as it calls itself on a subtree of the parse tree.</p>
 
 <p><span  class="math">\[\frac{\{P \land E\}C_1\{Q\} \quad \{P \land \neg E\}C_2\{Q\}}{\{P\}\text{if } E \text{ then } C_1 \text{ else } C_2\{Q\}}\quad (\text{IF})\]</span></p>
 <div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="k">elif</span> <span class="n">command</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="sa"></span><span class="s2">&#34;</span><span class="s2">if</span><span class="s2">&#34;</span><span class="p">:</span>
@@ -438,8 +437,8 @@ proved Implies(And(And(And(r == 5*i, 0 &lt;= 10 - i), 10 &gt; i),
 The triple is valid</code></pre></div>
 <p>Great! We can see exactly that all 5 while premises have been proved, so it is fair to say that this loop has been proven formally that it <strong>terminates</strong> and r will contain the result of <span  class="math">\(5 \cdot 10\)</span>.</p>
 
-<p>To experiment with this simple system (and maybe contribute to it) you can <code>git clone</code> <a href="https://github.com/gio54321/hoare-logic-prover">the repository</a>, and you can run an example proof (for example the variable swap one) by:</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">python src/lpp_prover.py examples/var_swap.lpp</code></pre></div>
+<p>To experiment with this simple system (and maybe contribute to it) you can clone <a href="https://github.com/gio54321/hoare-logic-prover">the repository</a>, and you can run an example proof (for example the variable swap one) by:</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">$ python src/lpp_prover.py examples/var_swap.lpp</code></pre></div>
 <p>In the <a href="https://github.com/gio54321/hoare-logic-prover/tree/master/examples">examples folder</a> on github there are a bunch of triples that should give you the feeling of the capability of this system.</p>
 
 <h1 id="conclusions">Conclusions</h1>
@@ -497,7 +496,17 @@ The triple is valid</code></pre></div>
 
         </section>
 
-        <script src="https://gio54321.github.io/js/jquery-3.3.1.min.js"></script>
+        <script>
+  let c = document.querySelectorAll('code');
+  for (let i=0; i<c.length; i++){
+    if (c[i].classList.length == 0){
+      console.log(c[i]);
+      c[i].classList.add("language-none");
+    }
+  }
+</script>
+
+<script src="https://gio54321.github.io/js/jquery-3.3.1.min.js"></script>
 <script src="https://gio54321.github.io/js/main.js"></script>
 <script src="https://gio54321.github.io/js/prism.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>

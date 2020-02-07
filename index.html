@@ -46,7 +46,6 @@
 	
 	
 	<a href='https://gio54321.github.io/posts'>Archive</a>
-	<a href='https://gio54321.github.io/tags'>Tags</a>
 	<a href='https://gio54321.github.io/about'>About</a>
 
 	
@@ -126,7 +125,17 @@
 
     </section>
 
-    <script src="https://gio54321.github.io/js/jquery-3.3.1.min.js"></script>
+    <script>
+  let c = document.querySelectorAll('code');
+  for (let i=0; i<c.length; i++){
+    if (c[i].classList.length == 0){
+      console.log(c[i]);
+      c[i].classList.add("language-none");
+    }
+  }
+</script>
+
+<script src="https://gio54321.github.io/js/jquery-3.3.1.min.js"></script>
 <script src="https://gio54321.github.io/js/main.js"></script>
 <script src="https://gio54321.github.io/js/prism.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
