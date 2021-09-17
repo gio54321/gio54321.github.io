@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		 
+			
+  
+    <meta name="twitter:card" content="summary"/>
+    
+      <meta name="twitter:image" content="https://gio54321.github.io/images/avatar.png" />
+    
+  
+  
+  <meta name="twitter:title" content="Non refutation of the law of excluded middle in intuitionistic logic"/>
+  <meta name="twitter:description" content="Proof of non refutation of the law of excluded middle in intuitionistic logic"/>
+  
+    <meta name="twitter:site" content="@g_dellimmagine"/>
+  
+  
+  
+  
+    <meta name="twitter:creator" content="@Giorgio Dell&#39;Immagine"/>
+  
+
+
+
+		
+		<meta name="author" content="Giorgio Dell&#39;Immagine">
+		<meta name="description" content="Site Description">
+		<meta name="generator" content="Hugo 0.68.3" />
+		<title>Non refutation of the law of excluded middle in intuitionistic logic &middot; Giorgio Dell&#39;Immagine</title>
+		<link rel="shortcut icon" href="https://gio54321.github.io/images/favicon.ico">
+		<link rel="stylesheet" href="https://gio54321.github.io/css/style.css">
+		<link rel="stylesheet" href="https://gio54321.github.io/css/prism.css">
+
+		
+		<link rel="stylesheet" href="https://gio54321.github.io/css/font-awesome.min.css">
+		
+
+		
+		<link href="https://gio54321.github.io/index.xml" rel="alternate" type="application/rss+xml" title="Giorgio Dell&#39;Immagine" />
+		
+
+		
+	</head>
+
+    <body>
+       <nav class="main-nav">
+	
+	
+		<a href='https://gio54321.github.io/'> <span class="arrow">←</span>Home</a>
+	
+	<a href='https://gio54321.github.io/posts'>Archive</a>
+	<a href='https://gio54321.github.io/about'>About</a>
+
+	
+
+	
+	<a class="cta" href="https://gio54321.github.io/index.xml">Subscribe</a>
+	
+</nav>
+
+
+        <section id="wrapper" class="post">
+            <article>
+                <header>
+                    <h1>
+                        Non refutation of the law of excluded middle in intuitionistic logic
+                    </h1>
+                    <h2 class="headline">
+                    Sep 17, 2021 00:00
+                    · 668 words
+                    · 4 minute read
+                      <span class="tags">
+                      
+                      </span>
+                    </h2>
+                </header>
+                
+                <section id="post-body">
+                    <p><a href="https://en.wikipedia.org/wiki/Intuitionistic_logic">Intuitionistic logic</a> refers to a system of symbolic logic that differ from classical logic by removing the law of excluded middle (that is <span  class="math">\(p \vee \neg p\)</span>) and the double negation elimination (that is <span  class="math">\(\neg \neg p \rightarrow p\)</span>).</p>
+
+<p>One of the central theorem that can be proved in intuitionistic logic, that will be our best friend in this post, is the non refutation of the law of excluded middle, which looks something like this:</p>
+
+<p><span  class="math">\[
+\neg \neg (A \vee \neg A)
+\]</span></p>
+
+<p>Intuitionism focuses of positive construction of proofs, so the theorem shall be read as <strong>&quot;Intuitionistic logic does not positively refute the law of excluded middle&quot;</strong>.</p>
+
+<p>Remembering that <span  class="math">\(\neg A\)</span> is defined as <span  class="math">\(A \rightarrow \bot\)</span> the theorem is expressed equivalently like</p>
+
+<p><span  class="math">\[
+((A \vee (A \rightarrow  \bot)) \rightarrow \bot) \rightarrow \bot
+\]</span></p>
+
+<p>In this post we will prove it with two different methods: using natural deduction and using lambda calculus.</p>
+
+<h2 id="proof-using-natural-deduction">Proof using natural deduction</h2>
+
+<p>I assume some familiarity with the natural deduction proof style. You can read about it (more than enough to understand this derivation) on <a href="https://en.wikipedia.org/wiki/Natural_deduction">Wikipedia</a>.</p>
+
+<p>For typographical purposes I will split up the proof in two parts.</p>
+
+<p>First let's prove that under the assumption <span  class="math">\(w\)</span> that <span  class="math">\((A \vee (A \rightarrow \bot)) \rightarrow \bot\)</span> the formula <span  class="math">\(A\rightarrow \bot\)</span> holds.</p>
+
+<p><span  class="math">\[
+\dfrac{\dfrac{\dfrac{\dfrac{}{A \: \text{true}}u}{A \vee (A \rightarrow \bot)\: \text{true}} \vee _I \qquad \dfrac{}{(A \vee (A \rightarrow \bot)) \rightarrow \bot \: \text{true}}w}{\bot \: \text{true}} \rightarrow _E}{A \rightarrow \bot \: \text{true}}\rightarrow _I ^u
+\]</span></p>
+
+<p>In this proof we have discharged the hypothesis <span  class="math">\(u\)</span> but not <span  class="math">\(w\)</span>. I will call this proof <span  class="math">\(P^w\)</span> to indicate that there is the non-discharged assumption <span  class="math">\(w\)</span>.</p>
+
+<p>Now let's complete the proof.</p>
+
+<p><span  class="math">\[
+\dfrac{\dfrac{\dfrac{\dfrac{P^w}{A \rightarrow \bot \: \text{true}}}{A \vee (A \rightarrow \bot)\: \text{true}} \vee _I \qquad \dfrac{}{(A \vee (A \rightarrow \bot)) \rightarrow \bot \: \text{true}}w}{\bot \: \text{true}} \rightarrow _E}{((A \vee (A \rightarrow \bot)) \rightarrow \bot)\rightarrow \bot\: \text{true}} \rightarrow _I ^w
+\]</span></p>
+
+<p>And with that we have proven the theorem!</p>
+
+<p>Notice that we have actually used the assumption <span  class="math">\(w\)</span> two times. This might seem strange at first, but it is allowed because the two assuptions are taken in the same subproof &quot;above&quot; the discharge.</p>
+
+<h2 id="proof-using-lambda-calculus">Proof using lambda calculus</h2>
+
+<p>By the virtue of the <a href="https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence">Curry-Howard correspondence</a>, we can try to find a lambda tem that has type</p>
+
+<p><span  class="math">\[
+((A \vee (A \rightarrow  \bot)) \rightarrow \bot) \rightarrow \bot
+\]</span></p>
+
+<p>and we would have our proof. Lambda terms like this are sometimes called <strong>proof terms</strong>.
+It turns out that the term</p>
+
+<p><span  class="math">\[
+\lambda f. \: f \: (\text{right}(\lambda a. \: f \: \text{left}(a))))
+\]</span></p>
+
+<p>has the desired type. We could check this by hand, but that would require a lot of work.
+What we can instead do is try to import it into Haskell and let the typechecker do the hard work.</p>
+<div class="highlight"><pre class="chroma"><code class="language-hs" data-lang="hs"><span class="kr">import</span> <span class="nn">Data.Void</span>
+
+<span class="nf">thm</span> <span class="ow">::</span> <span class="p">((</span><span class="kt">Either</span> <span class="n">a</span> <span class="p">(</span><span class="n">a</span> <span class="ow">-&gt;</span> <span class="kt">Void</span><span class="p">))</span> <span class="ow">-&gt;</span> <span class="kt">Void</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="kt">Void</span>
+<span class="nf">thm</span> <span class="n">f</span> <span class="ow">=</span> <span class="n">f</span> <span class="p">(</span><span class="kt">Right</span> <span class="p">(</span><span class="nf">\</span><span class="n">a</span> <span class="ow">-&gt;</span> <span class="n">f</span> <span class="p">(</span><span class="kt">Left</span> <span class="n">a</span><span class="p">)))</span></code></pre></div>
+<p>or, more elegantly</p>
+<div class="highlight"><pre class="chroma"><code class="language-hs" data-lang="hs"><span class="nf">thm</span> <span class="n">f</span> <span class="ow">=</span> <span class="n">f</span> <span class="p">(</span><span class="kt">Right</span> <span class="p">(</span><span class="n">f</span> <span class="o">.</span> <span class="kt">Left</span><span class="p">))</span></code></pre></div>
+<p>This indeed typechecks, so that is also a proof of our theorem!</p>
+
+<h2 id="consequences">Consequences</h2>
+
+<p>Even though the law of excluded middle does not hold in intuitionistic logic, it holds in this &quot;double negated form&quot;.
+Now recall that, while in intuitionistic logic it is not valid that <span  class="math">\(\neg \neg p \rightarrow p\)</span>, a very similar theorem holds:</p>
+
+<p><span  class="math">\[
+p \rightarrow \neg \neg p
+\]</span></p>
+
+<p>Intuitively this means that everithing that is provable in intuitionistic logic is then provable in this double negated form, so in some sense all the theorems that are of the form <span  class="math">\(\neg \neg p\)</span> are all the theorems <span  class="math">\(p\)</span> that hold in intuitionistic logic, plus the law of excluded middle.
+The double negated form is then stronger than the &quot;normal&quot; form.</p>
+
+<p>This central idea is formalized in the <a href="https://en.wikipedia.org/wiki/Double-negation_translation">double negation translation</a>, in particular in the Glivenko's theorem, that states that</p>
+
+<blockquote>
+<p>If <span  class="math">\(p\)</span> is a propositional formula, <span  class="math">\(p\)</span> is a classical tautology iff <span  class="math">\(\neg \neg p\)</span> is an intuitionistic tautology</p>
+</blockquote>
+
+<p>This results has been further extended to first-order logic.</p>
+
+                </section>
+            </article>
+
+            
+                <a class="twitter" href="https://twitter.com/intent/tweet?text=https%3a%2f%2fgio54321.github.io%2fposts%2fnot-refute-lem%2f - Non%20refutation%20of%20the%20law%20of%20excluded%20middle%20in%20intuitionistic%20logic by @g_dellimmagine"><span class="icon-twitter"> tweet</span></a>
+
+<a class="facebook" href="#" onclick="
+    window.open(
+      'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href),
+      'facebook-share-dialog',
+      'width=626,height=436');
+    return false;"><span class="icon-facebook-rect"> Share</span>
+</a>
+
+            
+
+            
+
+            
+
+            <footer id="footer">
+    
+        <div id="social">
+
+	
+	
+    <a class="symbol" href="https://www.github.com/gio54321">
+        <i class="fa fa-github-square"></i>
+    </a>
+    
+    <a class="symbol" href="https://www.twitter.com/g_dellimmagine">
+        <i class="fa fa-twitter-square"></i>
+    </a>
+    
+
+
+</div>
+
+    
+    <p class="small">
+    
+       © Copyright 2021 <i class="fa fa-heart" aria-hidden="true"></i> Giorgio Dell&#39;Immagine
+    
+    </p>
+    <p class="small">
+        Powered by <a href="http://www.gohugo.io/">Hugo</a>
+    </p>
+</footer>
+
+        </section>
+
+        <script>
+  let c = document.querySelectorAll('code');
+  for (let i=0; i<c.length; i++){
+    if (c[i].classList.length == 0){
+      console.log(c[i]);
+      c[i].classList.add("language-none");
+    }
+  }
+</script>
+
+<script src="https://gio54321.github.io/js/jquery-3.3.1.min.js"></script>
+<script src="https://gio54321.github.io/js/main.js"></script>
+<script src="https://gio54321.github.io/js/prism.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+
+
+
+
+
+    </body>
+</html>
