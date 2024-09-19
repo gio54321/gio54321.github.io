@@ -9,7 +9,6 @@ tags = [
     "Writeup"
 ]
 math = true
-draft = "true"
 +++
 
 Last weekend, together with my team we hosted a [CTF event](https://ctftime.org/event/2294) for the MOCA hacker camp.
