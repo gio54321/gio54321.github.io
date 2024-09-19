@@ -195,6 +195,7 @@ With this constraint removed the exploitation idea is very simple: craft an exec
 In the trace:
 - the lookup argument will return 4, as it is an `add` and the operands values are 2 and 2, but
 - the written value in the output register will be 5 in the trace.
+
 The constraint which imposes that these two values need to be equal has been removed, so the trace will be accepted!
 
 
