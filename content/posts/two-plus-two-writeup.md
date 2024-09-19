@@ -160,15 +160,15 @@ TL;DR: to solve the challenge we need to provide a proof of execution of the gue
 
 # Jolt architecture
 
-An overview of the architecture of Jolt is given in the [documentation](https://jolt.a16zcrypto.com/how/architecture.html), but I will briefly recp it here.
-There are four main components that are interconnected for the overall execution checks.
+An overview of the architecture of Jolt is given in the [documentation](https://jolt.a16zcrypto.com/how/architecture.html), but I will briefly recap it here.
+There are four main components that are interconnected in the overall execution check.
 
 - **Read-Write memory** which uses a memory checking argument to check that accesses to the registers and in memory are correct.
 - **Instruction lookup** which uses a custom lookup argument called Lasso to check that the executions of the instructions are correct, e.g., that the result of the execution of an `add` instruction really is the sum of the operands.
 - **Bytecode** which uses a read-only lookup argument to perform reads into the decoded instructions.
 - **R1CS** which handle program counter updates, and serves as a glue for all the other modules.
 
-The patch is in the R1CS component, let's look at the constraint that was removed
+The patch is in the R1CS component, let's look at the constraint that was removed.
 
 ```c
 cs.constrain_eq_conditional(
@@ -179,13 +179,13 @@ cs.constrain_eq_conditional(
 ```
 
 The function `constrain_eq_conditional` adds to the R1CS constraint system an equality of the second and third argument, if the first argument is set to 1.
-Roughly, the emitted constraint is
+Roughly, the emitted constraint is equivalent to the following.
 ```c
 cs.constrain_eq_conditional(condition, left, right);
 // condition  * (left - right) == 0
 ```
 
-There is also a useful comment explaining the removed constraint
+There is also a useful comment a few lines above explaining the constraint.
 ```c
 // if (rd != 0 && update_rd_with_lookup_output == 1) constrain(rd_val == LookupOutput)
 ```
@@ -193,8 +193,8 @@ An intuitive explaination is the following: the value written in the output regi
 
 With this constraint removed the exploitation idea is very simple: craft an execution trace in which the `add` instruction which sums 2 and 2, instead of writing back in the output register the value 4 writes the value 5.
 In the trace:
-- the lookup argument will return 4, as it is an `add` and the operands values are 2 and 2, but
-- the written value in the output register will be 5 in the trace.
+- the lookup argument will return 4, as the instruction is an `add` and the operands values are 2 and 2, but
+- the value written back in the output register will be 5.
 
 The constraint which imposes that these two values need to be equal has been removed, so the trace will be accepted!
 
@@ -259,7 +259,7 @@ pub fn main() {
 }
 ```
 
-Of course sending the generated proof to the server gives back the flag
+After all that, sending the generated proof to the server gives back the flag
 ```txt
 MOCA{k1dding_m3?_tw0_p1u5_tw0_1s_f0ur_WTF!!?!}
 ```
