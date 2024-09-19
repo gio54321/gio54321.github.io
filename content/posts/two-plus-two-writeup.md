@@ -24,7 +24,7 @@ I thought that this could be a challenge with a quite funny theme, and in the en
 
 # Challenge description
 
-The complete challenge sources will be released in a few days, I will update the page to lik them.
+The complete challenge sources will be released in a few days, I will update the page to link them.
 
 The challenge attachments come with a couple of files
 
@@ -188,6 +188,11 @@ cs.constrain_eq_conditional(condition, left, right);
 There is also a useful comment a few lines above explaining the constraint.
 ```c
 // if (rd != 0 && update_rd_with_lookup_output == 1) constrain(rd_val == LookupOutput)
+cs.constrain_eq_conditional(
+    rd_nonzero_and_lookup_to_rd,
+    JoltIn::RD_Write,
+    JoltIn::LookupOutput,
+);
 ```
 An intuitive explaination is the following: the value written in the output register should be equal to the result of the execution lookup argument, if the instruction is supposed to write its result into a register and if the output register is not zero.
 
@@ -225,7 +230,7 @@ We modify the `jolt/tracer/src/emulator/cpu.rs` file, changing the semantics of 
     },
 ```
 
-One insteresting thing we can do is print out the execution trace, at the exact step in which the `add {n}, {n}, {n}` instruction is executed:
+One insteresting thing we can do is print out the execution trace at the exact step in which the `add {n}, {n}, {n}` instruction is executed:
 ```rust
 Trace[5]
 JoltTraceStep {
@@ -243,8 +248,6 @@ JoltTraceStep {
 }
 ```
 The main bit to notice here are the memory operations: there are two read operations (for the add operands), and a write operation to the same register with value 5!
-This is one way of approaching the challenge, but actually the removal of that constraint gives a much more powerful primitive: we can write arbitrary values into registers for each instruction which writes back its result into a register!
-
 Putting it all together, the main solver Rust program is quite straight forward (using the modified Jolt library)
 
 ```rust
@@ -259,7 +262,9 @@ pub fn main() {
 }
 ```
 
-After all that, sending the generated proof to the server gives back the flag
+This is one way of approaching the challenge, but actually the removal of that constraint gives a much more powerful primitive: we can write arbitrary values into registers for each instruction which writes back its result into a register!
+
+Anyway, after all that sending the generated proof to the server gives back the flag
 ```txt
 MOCA{k1dding_m3?_tw0_p1u5_tw0_1s_f0ur_WTF!!?!}
 ```
