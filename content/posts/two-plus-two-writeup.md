@@ -1,7 +1,7 @@
 +++
 authors = ["Giorgio Dell'Immagine"]
 title = "MOCA CTF finals 2024 - 2+2=5 writeup"
-date = "2024-09-20"
+date = "2024-09-18"
 description = "MOCA CTF finals 2024 - 2+2=5 writeup"
 tags = [
     "zkvm",
@@ -9,6 +9,7 @@ tags = [
     "Writeup"
 ]
 math = true
+draft = "true"
 +++
 
 Last weekend, together with my team we hosted a [CTF event](https://ctftime.org/event/2294) for the MOCA hacker camp.
