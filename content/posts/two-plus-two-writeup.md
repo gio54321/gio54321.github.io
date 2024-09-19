@@ -4,7 +4,7 @@ title = "MOCA CTF finals 2024 - 2+2=5 writeup"
 date = "2024-09-18"
 description = "MOCA CTF finals 2024 - 2+2=5 writeup"
 tags = [
-    "zkvm",
+    "zkVM",
     "Jolt",
     "Writeup"
 ]
@@ -13,11 +13,11 @@ math = true
 
 Last weekend, together with my team we hosted a [CTF event](https://ctftime.org/event/2294) for the MOCA hacker camp.
 It was a great event, and I managed to write two challenges.
-One of them was about [Jolt](https://jolt.a16zcrypto.com/), a RISC-V based zkvm.
+One of them was about [Jolt](https://jolt.a16zcrypto.com/), a RISC-V based zkVM.
 
 The overall idea while creating the challenge was to
 - clone the Jolt repository
-- remove some random line
+- remove some random lines
 - make players prove that $2+2=5$ (as the name implies!)
 
 I thought that this could be a challenge with a quite funny theme, and in the end I think it came out pretty instructive as well!
@@ -44,7 +44,7 @@ git checkout 0cc7aa31981ff8503fe256706d2aa9c320abd1cd
 git apply ../diff.patch
 ```
 
-A patch has been applied to the Jolt zkvm, which is contained in `diff.patch`.
+A patch has been applied to the Jolt zkVM, which is contained in `diff.patch`.
 The patch removes a few of lines from the `jolt-core/src/r1cs/jolt_constraints.rs` file
 ```patch
 diff --git a/jolt-core/src/r1cs/jolt_constraints.rs b/jolt-core/src/r1cs/jolt_constraints.rs
@@ -168,7 +168,7 @@ There are four main components that are interconnected in the overall execution 
 - **Bytecode** which uses a read-only lookup argument to perform reads into the decoded instructions.
 - **R1CS** which handle program counter updates, and serves as a glue for all the other modules.
 
-The patch is in the R1CS component, let's look at the constraint that was removed.
+The patch is in the [R1CS component](https://jolt.a16zcrypto.com/how/r1cs_constraints.html), let's look at the constraint that was removed.
 
 ```c
 cs.constrain_eq_conditional(
