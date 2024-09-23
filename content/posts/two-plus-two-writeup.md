@@ -22,9 +22,9 @@ The overall idea while creating the challenge was to
 
 I thought that this could be a challenge with a quite funny theme, and in the end I think it came out pretty instructive as well!
 
-# Challenge description
+You can find all the challenge sources [here](https://github.com/fibonhack/moca-ctf-finals-challs/tree/master/crypto/two_plus_two)
 
-The complete challenge sources will be released in a few days, I will update the page to link them.
+# Challenge description
 
 The challenge attachments come with a couple of files
 

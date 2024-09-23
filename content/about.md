@@ -5,6 +5,14 @@ aliases = ["about-me", "about", "contact"]
 +++
 
 
+> **D'altrónde**
+>
+> av.
+> 
+> 1. (= del resto) in any case, after all
+> 2. (= d’altra parte) on the other hand, besides, (but) then again, there again
+
+
 👋 Hello I'm Giorgio, a computer science student based in Italy, currently working to get my master’s degree.
 You can find me on most sites as `gio54321` or `gio-d3141` (yes I like numbers).
 
