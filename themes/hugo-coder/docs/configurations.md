@@ -242,7 +242,7 @@ theme = "hugo-coder"
 languagecode = "en"
 defaultcontentlanguage = "en"
 
-paginate = 20
+pagination.pagerSize = 20
 
 disqusShortname = "yourdiscussshortname"
 
