@@ -1,7 +1,7 @@
 +++
 authors = ["Giorgio Dell'Immagine"]
 title = "Forget expensive hardware simulators, Microsoft Excel is all you need!"
-date = "2024-10-19"
+date = "2024-10-20"
 description = "Forget expensive hardware simulators, Microsoft Excel is all you need!"
 tags = [
     "Excel",
@@ -13,20 +13,17 @@ math = true
 
 
 ![asd](banner.png)
-> **Fun fact** - The original experimentation spreadsheet was called `curso1` and was done in Google sheets. I nearly fused by PC twice running a heavy computation in the browser, and then I switched to Excel, which turns out is much more performant.
+> **Fun fact** - The original experimentation spreadsheet was called `curso1` and was done in Google Sheets. I nearly fried my PC twice running a heavy computation in the browser, so I switched to Excel, which turned out to be much more performant.
 
 # The origin story
-One day, I received a vocal message from a (probably drunk) [drw0if](https://x.com/drw0if) pitching me the idea of simulating hardware on Excel.
-He explained to me some sort of circuit being run over a spreadsheet, potentailly being synthetized from a higher level HDL.
-The idea was very silly, and we lacked ideas for upcoming CTF challenges, so we had to give it a shot!
+One day, I received a voice message from a (probably drunk) [drw0if](https://x.com/drw0if) pitching the idea of simulating hardware on Excel. He described a circuit being run over a spreadsheet, potentially synthesized from a higher-level HDL. The idea sounded silly, but we lacked ideas for upcoming CTF challenges, so we decided to give it a shot!
 
-The basic idea was simple: Excel can express quite easily combinatorial circuits.
-Indeed, we can
-- treat every wire as a cell,
-- simulate logic gates by using formulas that reference other cells.
+The basic concept was simple: Excel can easily express combinatorial circuits. In fact, we can:
+- Treat every wire as a cell.
+- Simulate logic gates using formulas that reference other cells.
 
-Fortunately, Excel comes with all the logic operators we wuold ever need in our lives, for example `AND`, `OR` and `NOT`!
-Let's take this simple combinatorial verilog module: it just computes the negation of `a` and computes the conjunction with `b`.
+Luckily, Excel provides all the logical operators we’d ever need, such as `AND`, `OR`, and `NOT`! Let’s consider this simple combinatorial Verilog module, which computes the negation of `a` and its conjunction with `b`.
+
 
 ```verilog
 module example(a, b, out);
@@ -37,39 +34,33 @@ module example(a, b, out);
 endmodule
 ```
 
-We can easily convert it to an Excel spreadsheet.
-The nice thing is that if we update the inputs, the output will be updated automatically, just like real hardware!
+We can easily convert this to an Excel spreadsheet. The great thing is that if we update the inputs, the output will automatically update, just like real hardware!
 
 {{< rawhtml >}}
 <img src="comb.gif" alt="DFF simulation" width="80%" class="dark" style="display:block;margin-left: auto;margin-right: auto;"/>
 {{< / rawhtml >}}
 
-Now, if you are following up until now I know what you are thinking: *boooooring*, we can just translate a circuit into an Excel formula and call it a day.
-I promise, however, things will get interesting.
+Now, if you're still with me, I know what you're thinking: boooooring. We can just translate a circuit into an Excel formula and call it a day. But I promise, things will get interesting.
 
 # Welcome, iterative computation
 
-Iterative computation is a quite obscure feature of Excel. Normally, when trying to input formulas that have a reference cycle it will give an error, because there isn't anymore a clear data dependency between the cell values.
-There is however one feature of Excel that is intended for computing things with iterative methods (like Newton't method for example), and can be enabled in the settings.
+Iterative computation is a somewhat obscure feature of Excel. Normally, when you input formulas that create a reference cycle, Excel returns an error because there’s no clear data dependency between the cell values. However, Excel has a feature for computing iterative methods (such as Newton’s method), which can be enabled in the settings.
 
 {{< rawhtml >}}
 <img src="iterative.png" alt="DFF simulation" width="80%" class="dark" style="display:block;margin-left: auto;margin-right: auto;"/>
 {{< / rawhtml >}}
 
-The [calculation process](https://www.decisionmodels.com/calcsecretsc.htm) of Excel is quite straight forward in the normal case: all formulas references can be put into a dependency graph, and Excel will walk the dependency graph every time it needs to update something.
-This enables only partial computation when some update only influences part of the formulas.
-Also, Excel cleverly puts branches of this dependency graph into different threads to speed up the calculations.
+Excel's [calculation process](https://www.decisionmodels.com/calcsecretsc.htm) is quite straightforward in typical scenarios: all formula references can be put into a dependency graph, and Excel walks through this graph to update cells as needed. This enables partial computation when updates only affect certain formulas. Excel also cleverly divides branches of the dependency graph into different threads to speed up calculations.
 
-What appens when **iterative computation** is enabled? There is no clear evaluation ordering anymore because there are cycles in the references (the dependency graph is not a DAG anymore), so Excel simply updates every cell with the current values, starting from the top row going left, then second row and so on.
-Normally this process continues in a loop until either:
-- the change of values between two iteration is less than some epsilon, or
-- the iteration limit is reached.
+What happens when **iterative computation** is enabled? The reference cycles mean there’s no clear evaluation order (the dependency graph is no longer a DAG). So, Excel simply updates each cell in sequence, starting from the top row and moving left, then the second row, and so on. This process continues until:
+- The value changes between two iterations fall below a certain threshold, or
+- The iteration limit is reached.
 
-For the rest of the post we will assume that the iteration number limit is set to `1`, so that Excel will do only one update at a time.
+For this post, we'll assume the iteration limit is set to `1`, so Excel performs only one update per cycle.
 
 {{< notice tip >}}
-A very nice trick to make Excel execute an update of the entire sheet while iterative computation is enabled is click on a random cell and press `Del`.
-Excel will think that we just deleted something very important and will frantically update every cell in the sheet! 😆
+A neat trick to force Excel to update the entire sheet while iterative computation is enabled is to click on a random cell and press `Del`.
+Excel will think something important was deleted and frantically update every cell! 😆
 {{< /notice >}}
 
 {{< rawhtml >}}
@@ -78,18 +69,17 @@ Excel will think that we just deleted something very important and will frantica
 
 # Synchronized hardware primitives
 
-What happens for example when we say that a cell should be the negation of itself?
-We get a nice **clock**!
+What happens when we tell Excel that a cell should be the negation of itself? We get a nice **clock**!
 
 {{< rawhtml >}}
 <img src="clock.gif" alt="DFF simulation" width="80%" class="dark" style="display:block;margin-left: auto;margin-right: auto;"/>
 {{< / rawhtml >}}
 
 Do you see where this is going?
-What we really want to achieve is having a working memory element in Excel to be able to run sequential logic with a clock!
-In particular, we want to implement what's called a [D-Flip-Flop](https://en.wikipedia.org/wiki/Flip-flop_(electronics)#D_flip-flop), which has a clock and data inputs and one data output.
-At the **rising edge** of the clock, it stores the current data input value, and it holds it until the next rising edge.
-The truth table taken from Wikipedia is the following.
+The next step is to simulate a working memory element in Excel, enabling us to run sequential logic with a clock.
+Specifically, we want to implement a [D-Flip-Flop](https://en.wikipedia.org/wiki/Flip-flop_(electronics)#D_flip-flop), which has clock and data inputs and a data output.
+At the **rising edge** of the clock, it stores the current data input value and holds it until the next rising edge.
+The truth table (from Wikipedia) looks like this:
 
 | Clock | D | Q_next |
 |:---:|:---:|:---:|
@@ -97,17 +87,20 @@ Rising edge | 0 | 0
 Rising edge | 1 | 1
 Non-rising | X	| Q
 
-The problem is: how to simulate the rising clock behavior?
-Let's try to divide the clock cycle into micro-clocks, which are multiple discrete simulation steps doring which the main clock signal is not updated. The DFF will record the input value at the last micro-clock in which the clock signal is low, and will output the newly recorded value at the next micro-clock, which will be the first in which the clock is high.
+How do we simulate this rising clock behavior?
+We can divide the clock cycle into micro-clocks, which are multiple discrete simulation steps where the main clock signal doesn’t update.
+The DFF records the input value at the last micro-clock when the clock signal is low and outputs the recorded value at the next micro-clock, the first one where the clock is high.
 
 {{< rawhtml >}}
 <img src="block-diagram.svg" alt="DFF simulation" width="80%" class="dark" style="display:block;margin-left: auto;margin-right: auto;"/>
 {{< / rawhtml >}}
 
-This is implemented using a micro-clock counter and resolution. The clock signal updates only if the micro-clock counter is zero. The DFF will record the input value only if the clock signal is low, and the micro-clock value is the last one in the cycle.
-In a circuit with multiple DFFs, every DFF is updated simultaneously in the same sheet update.
+This can be implemented using a micro-clock counter and resolution.
+The clock signal updates only when the micro-clock counter hits zero.
+The DFF records the input value when the clock is low, and the micro-clock is at its last value in the cycle.
+In a circuit with multiple DFFs, all are updated simultaneously in the same sheet update.
 
-Using some Excel formulas, we can implement this behavior quite easily.
+With a few Excel formulas, we can easily implement this behavior:
 ```py
 clock_res = 10
 
@@ -122,21 +115,20 @@ dff = IF(AND(NOT(clk), micro_clk = clock_res - 1), data_in, dff)
 ```
 
 Why does it have to be this complicated? Well, because in the end we want to simulate some sequential logic, with the input and output of DFFs feeding into each other in a loop.
-It turns out that the ordering of the updates in Excel gives some weird glitching in a few occasions, so using this method ensures that all the inputs are sampled at the same sheet update.
+Using this method ensures that all the inputs are sampled at the same sheet update, avoiding weird glitches that sometimes happened.
 Of course, if some inputs in the circuit change at this last micro-clock then we could have inconsistent behavior, but we will make the assumption that the network has stabilized before the last micro-clock.
-Of course, we should choose a clock resolution that is small enough to capture the behavior of the circuit, but not too small to make the simulation slow.
-
+We should therefore choose a clock resolution that is small enough to capture the correct behavior of the circuit, but not too small to make the simulation slow.
 
 # From Verilog to Excel
 
 So far we have the following building blocks:
-- a clock signal,
-- the ability to simulate combinatorial logic,
-- the ability to place DFFs in the circuit.
+- A clock signal.
+- The ability to simulate combinatorial logic.
+- The ability to place DFFs in the circuit.
 
-In principle, now we are ready to write a Verilog program, synthesize it into a netlist, and then convert the netlist into an Excel spreadsheet.
-Fortunately this is way easier than I thought it would be thanks to [yosys](https://github.com/YosysHQ/yosys), an open source synthesis suite that can convert Verilog into a netlist.
-This is also very similar to what Zellic have done in their [MPC from scratch](https://www.zellic.io/blog/mpc-from-scratch/) article, which I recommend checking out!
+Now, we are ready to write a Verilog program, synthesize it into a netlist, and then convert the netlist into an Excel spreadsheet.
+Fortunately this is way easier than I expected thanks to [yosys](https://github.com/YosysHQ/yosys), an open source synthesis suite that can convert Verilog into a netlist.
+This is also very similar to what Zellic have done in their [MPC from scratch](https://www.zellic.io/blog/mpc-from-scratch/) post, which I recommend checking out!
 
 Let's write a `primitives.lib` file, which basically describes the set of hardware primitives we have available in the hardware (Excel).
 We will support `NAND`, `NOR`, `NOT`, and `DFF` primitives.
@@ -182,7 +174,7 @@ library(demo) {
 }
 ```
 
-Then we can write a synthesizer script that will convert a generic Verilog code into another Verilog code, but only using the hardware primitives we have available.
+Next, we write a synthesizer script to convert generic Verilog code into Verilog that only uses our available hardware primitives.
 
 ```sh
 # read design
@@ -216,24 +208,24 @@ This script will take a `input.v` file, synthesize it into a netlist using the p
 <img src="sinth.gif" alt="DFF simulation" width="80%" class="dark" style="display:block;margin-left: auto;margin-right: auto;"/>
 {{< / rawhtml >}}
 
-Now, we can just convert that verilog file straight into Excel using a straight forward Python script, by assigning each wire to a cell, and implementing logic and memory gates.
-If enough people are interested we can release the conversion script, but it's quite straight forward to implement.
+Finally, we convert the Verilog file into Excel using a simple Python script that assigns each wire to a cell and implements the logic and memory gates.
 
 # The epilogue
 
-Our original idea was to create a CTF challenge where the participants would have to reverse engineer a circuit from an Excel spreadsheet.
-We wrote a simple flag checker, tested that it worked fine, added a bit of styling, and this was the result.
+Our original idea was to create a CTF challenge where participants reverse-engineer a circuit from an Excel spreadsheet.
+We wrote a simple flag checker in Verilog, tested it, added some styling, and here’s the result.
 
 {{< rawhtml >}}
 <img src="sheet.webp" alt="DFF simulation" width="50%" class="dark" style="display:block;margin-left: auto;margin-right: auto;"/>
 {{< / rawhtml >}}
+> You can download the original attachment [here](https://github.com/fibonhack/MOCA-2024-finals-challs/tree/main/misc/curso1/attachments).
 
-We tested this method on a circuit that had around 14k wires when synthetized, and was running for 550 clock cycles more or less.
-Running the flag checker takes about 4 minutes on my machine, which is quite a lot for only a few clock cycles, but it's still manageable.
-You can download the original attachment [here](https://github.com/fibonhack/MOCA-2024-finals-challs/tree/main/misc/curso1/attachments).
+We tested this method on a circuit with around 14k wires and 550 clock cycles.
+Running the flag checker takes about four minutes, which is a lot for a few hundreds clock cycles, but still manageable.
 
-The funny thing is that nobody in our team was able to solve it, even after some hints.
+The funny thing is that while testing it nobody in our team was able to solve it, even after some hints.
 With the optimizaions and reorderings done by yosys, it was *very* hard to reverse engineer the circuit from the spreadsheet.
-We ended up releasing as a meme challenge, explicitly saying to the participants that this was a meme challenge and that they should not waste a huge amount of time on it.
+Since we spent quite a bit of time on it, we ended up releasing it as a meme challenge, explicitly stating to the participants that they should not waste a lot of time on it.
 Unsurprisingly, no teams managed to solved it, so I guess there is a limit to the cursedness of a challenge! 😆
 
+In the end, should you use Excel to simulate hardware? Probably not.
