@@ -12,7 +12,8 @@ math = true
 +++
 
 
-![asd](banner.png)
+![featured](thumbnail.png)
+
 > **Fun fact** - The original experimentation spreadsheet was called `curso1` and was done in Google Sheets. I nearly fried my PC twice running a heavy computation in the browser, so I switched to Excel, which turned out to be much more performant.
 
 # The origin story
