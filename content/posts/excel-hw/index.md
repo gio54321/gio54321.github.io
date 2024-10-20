@@ -223,9 +223,9 @@ We wrote a simple flag checker in Verilog, tested it, added some styling, and he
 We tested this method on a circuit with around 14k wires and 550 clock cycles.
 Running the flag checker takes about four minutes, which is a lot for a few hundreds clock cycles, but still manageable.
 
-The funny thing is that while testing it nobody in our team was able to solve it, even after some hints.
+The funny thing is that while testing it, nobody in our team was able to solve it, even after some hints.
 With the optimizaions and reorderings done by yosys, it was *very* hard to reverse engineer the circuit from the spreadsheet.
-Since we spent quite a bit of time on it, we ended up releasing it as a meme challenge, explicitly stating to the participants that they should not waste a lot of time on it.
+We actually ended up releasing it as a meme challenge, explicitly stating to the participants that they should not waste a lot of time on it.
 Unsurprisingly, no teams managed to solved it, so I guess there is a limit to the cursedness of a challenge! 😆
 
 In the end, should you use Excel to simulate hardware? Probably not.
