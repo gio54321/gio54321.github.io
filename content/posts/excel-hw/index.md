@@ -112,7 +112,10 @@ micro_clk = MOD(micro_clk + 1, clock_res)
 clk = IF(micro_clk = 0, NOT(clk), clk)
 
 # DFF cell, updated only at the last micro-clock of low clk with data_in
-dff = IF(AND(NOT(clk), micro_clk = clock_res - 1), data_in, dff)
+dff_state = IF(AND(NOT(clk), micro_clk = clock_res - 1), data_in, dff_state)
+
+# DFF output, not updated until the first micro-clock of high clk
+dff_out = IF(AND(NOT(clk), micro_clk = clock_res - 1), dff_out, dff_state)
 ```
 
 Why does it have to be this complicated? Well, because in the end we want to simulate some sequential logic, with the input and output of DFFs feeding into each other in a loop.
