@@ -4,6 +4,9 @@
 
     {{ partialCached "home/author.html" . }}
 
+    <br>
+    Check out my <a href="{{ .Site.BaseURL }}about">about page</a> or my latest <a href="{{ .Site.BaseURL }}posts">posts</a>!
+
     {{ partialCached "home/social.html" . }}
   </div>
 

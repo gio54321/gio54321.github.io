@@ -11,11 +11,14 @@ pagination.pagerSize = 20
 [markup.highlight]
 style = "github-dark"
 
+[markup.goldmark.renderer]
+unsafe= true
+
 [params]
   author = "Giorgio Dell'Immagine"
-  info = "Exploring computers: the weird part"
-  description = "Exploring computers: the weird part"
-  keywords = "blog,developer,personal,security,CTF"
+  info = "Computer Science Student | Cryptography engineer"
+  description = "Computer Science Student & Cryptography engineer"
+  keywords = "blog,cryptography,developer,personal,security,CTF"
   # avatarurl = "images/avatar.jpg"
 
   #gravatar = "john.doe@example.com"
