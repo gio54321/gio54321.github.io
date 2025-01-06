@@ -17,7 +17,7 @@ av.
 
 # About
 👋 Hello I'm Giorgio, a Computer Science student based in Italy, currently working to get my master’s degree.
-I'm also working as a Cryptography Engineer for [zkSecurity](https://zksecurity.xyz).
+I'm also working as a Cryptography Engineer / Security Researcher at [zkSecurity](https://zksecurity.xyz).
 You can find me on most sites as `gio54321` or `gio-d3141` (yes I like numbers).
 
 In my free time I like to play (and sometimes organize) CTFs together with my team [Fibonhack](https://fibonhack.it) from Pisa.
@@ -32,6 +32,6 @@ Other random things I enjoy:
 
 ## Contact
 You can reach me out via Email at
-```sh
+```bash
 echo mocTODliamgTAenigammilledTODg | rev | sed 's/AT/@/g;s/DOT/./g'
 ```
