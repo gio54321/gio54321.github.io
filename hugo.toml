@@ -16,8 +16,8 @@ unsafe= true
 
 [params]
   author = "Giorgio Dell'Immagine"
-  info = "Computer Science Student | Cryptography Engineer"
-  description = "Computer Science Student & Cryptography Engineer"
+  info = "Security Researcher | Cryptography Engineer"
+  description = "Security Researcher | Cryptography Engineer"
   keywords = "blog,cryptography,developer,personal,security,CTF"
   # avatarurl = "images/avatar.jpg"
 
